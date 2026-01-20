@@ -31,6 +31,11 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+
+      - name: 打印时间
+        run: |
+          date
+          date -u
       
       - name: 安装依赖
         run: |
