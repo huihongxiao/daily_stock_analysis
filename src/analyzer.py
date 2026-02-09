@@ -195,6 +195,10 @@ class AnalysisResult:
     success: bool = True
     error_message: Optional[str] = None
 
+    # ========== 价格数据（分析时快照）==========
+    current_price: Optional[float] = None  # 分析时的股价
+    change_pct: Optional[float] = None     # 分析时的涨跌幅(%)
+
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
         return {
@@ -227,6 +231,8 @@ class AnalysisResult:
             'search_performed': self.search_performed,
             'success': self.success,
             'error_message': self.error_message,
+            'current_price': self.current_price,
+            'change_pct': self.change_pct,
         }
 
     def get_core_conclusion(self) -> str:
@@ -274,7 +280,29 @@ class AnalysisResult:
             '卖出': '🔴',
             '强烈卖出': '❌',
         }
-        return emoji_map.get(self.operation_advice, '🟡')
+        advice = self.operation_advice or ''
+        # Direct match first
+        if advice in emoji_map:
+            return emoji_map[advice]
+        # Handle compound advice like "卖出/观望" — use the first part
+        for part in advice.replace('/', '|').split('|'):
+            part = part.strip()
+            if part in emoji_map:
+                return emoji_map[part]
+        # Score-based fallback
+        score = self.sentiment_score
+        if score >= 80:
+            return '💚'
+        elif score >= 65:
+            return '🟢'
+        elif score >= 55:
+            return '🟡'
+        elif score >= 45:
+            return '⚪'
+        elif score >= 35:
+            return '🟠'
+        else:
+            return '🔴'
 
     def get_confidence_stars(self) -> str:
         """返回置信度星级"""
