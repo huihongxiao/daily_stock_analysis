@@ -14,6 +14,11 @@ on:
           - market-only   # 仅大盘复盘
           - stocks-only   # 仅股票分析
 
+      stocks:
+        description: '股票列表'
+        required: true
+        type: string
+
 # 并发控制：同一时间只运行一个分析任务
 concurrency:
   group: stock-analysis
@@ -128,7 +133,7 @@ jobs:
           # ==========================================
           # 自选股配置
           # ==========================================
-          STOCK_LIST: ${{ vars.STOCK_LIST || secrets.STOCK_LIST || '600519' }}
+          STOCK_LIST: ${{ github.event.inputs.stocks || vars.STOCK_LIST || secrets.STOCK_LIST || '600519' }}
           
           # ==========================================
           # 运行配置 ⬅️ 新增！
